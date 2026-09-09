@@ -1,4 +1,4 @@
-const postgres = require('postgres')
+import postgres from 'postgres'
 
 function newReference() {
   const rand = Math.random().toString(36).slice(2, 7).toUpperCase()
@@ -12,7 +12,7 @@ function isValidDateTime(date, time) {
   return true
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
