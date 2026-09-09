@@ -6,7 +6,7 @@
     { "source": "/admin/(.*)", "destination": "/index.html" }
   ],
   "functions": {
-    "api/bookings.ts": {
+    "api/bookings.js": {
       "maxDuration": 10
     }
   }
