@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { fetchBookings, type BookingRecord } from '../lib/booking'
-import { site } from '../data/site-content'
+import { ServiceManager } from './admin/ServiceManager'
+import { CategoryManager } from './admin/CategoryManager'
+import { SiteSettings } from './admin/SiteSettings'
+import { getHotDeals } from '../lib/cms'
 
 const POLL_MS = 5_000
 
@@ -28,15 +31,13 @@ function formatDate(d: string | null): string {
   return date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
-// Stat Card
-function StatCard({ label, value, icon, color, trend }: { label: string; value: string | number; icon: string; color: string; trend?: string }) {
+function StatCard({ label, value, icon, color }: { label: string; value: string | number; icon: string; color: string }) {
   return (
     <div className="rounded-xl border border-smoke bg-coal p-5 transition-all duration-300 hover:scale-105 hover:border-gold/50">
       <div className="flex items-center justify-between">
         <div>
           <p className="font-mono text-xs uppercase tracking-wider text-ashtray">{label}</p>
           <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
-          {trend && <p className="mt-1 font-mono text-xs text-green-400">{trend}</p>}
         </div>
         <span className="text-4xl opacity-20">{icon}</span>
       </div>
@@ -44,7 +45,6 @@ function StatCard({ label, value, icon, color, trend }: { label: string; value: 
   )
 }
 
-// Booking Status Chart
 function BookingChart({ bookings }: { bookings: BookingRecord[] }) {
   const statusCounts = bookings.reduce((acc, b) => {
     acc[b.status] = (acc[b.status] || 0) + 1
@@ -80,7 +80,6 @@ function BookingChart({ bookings }: { bookings: BookingRecord[] }) {
   )
 }
 
-// Weekly Chart
 function WeeklyChart({ bookings }: { bookings: BookingRecord[] }) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const dayCounts = new Array(7).fill(0)
@@ -114,7 +113,6 @@ function WeeklyChart({ bookings }: { bookings: BookingRecord[] }) {
   )
 }
 
-// Revenue Chart
 function RevenueChart({ bookings }: { bookings: BookingRecord[] }) {
   const monthlyData = useMemo(() => {
     const data: Record<string, number> = {}
@@ -153,7 +151,6 @@ function RevenueChart({ bookings }: { bookings: BookingRecord[] }) {
   )
 }
 
-// Service Breakdown
 function ServiceBreakdown({ bookings }: { bookings: BookingRecord[] }) {
   const serviceCounts = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -192,7 +189,6 @@ function ServiceBreakdown({ bookings }: { bookings: BookingRecord[] }) {
   )
 }
 
-// Calendar View
 function CalendarView({ bookings }: { bookings: BookingRecord[] }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   
@@ -253,24 +249,9 @@ function CalendarView({ bookings }: { bookings: BookingRecord[] }) {
           {currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
         </h3>
         <div className="flex gap-2">
-          <button
-            onClick={() => setCurrentDate(new Date(year, month - 1))}
-            className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold"
-          >
-            ←
-          </button>
-          <button
-            onClick={() => setCurrentDate(new Date())}
-            className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold"
-          >
-            Today
-          </button>
-          <button
-            onClick={() => setCurrentDate(new Date(year, month + 1))}
-            className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold"
-          >
-            →
-          </button>
+          <button onClick={() => setCurrentDate(new Date(year, month - 1))} className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold">←</button>
+          <button onClick={() => setCurrentDate(new Date())} className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold">Today</button>
+          <button onClick={() => setCurrentDate(new Date(year, month + 1))} className="rounded-lg border border-smoke px-3 py-1 font-mono text-xs text-ashtray hover:border-gold hover:text-gold">→</button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-1">
@@ -283,51 +264,6 @@ function CalendarView({ bookings }: { bookings: BookingRecord[] }) {
   )
 }
 
-// Client Directory
-function ClientDirectory({ bookings }: { bookings: BookingRecord[] }) {
-  const clients = useMemo(() => {
-    const map: Record<string, { name: string; contact: string; visits: number; lastVisit: string }> = {}
-    bookings.forEach((b) => {
-      const key = b.client_name.toLowerCase()
-      if (!map[key]) {
-        map[key] = { name: b.client_name, contact: b.contact, visits: 0, lastVisit: b.booking_date || '' }
-      }
-      map[key].visits++
-      if (b.booking_date && b.booking_date > map[key].lastVisit) {
-        map[key].lastVisit = b.booking_date
-      }
-    })
-    return Object.values(map).sort((a, b) => b.visits - a.visits)
-  }, [bookings])
-
-  return (
-    <div className="rounded-xl border border-smoke bg-coal p-6">
-      <h3 className="mb-4 font-mono text-xs uppercase tracking-wider text-ashtray">
-        Client Directory ({clients.length})
-      </h3>
-      {clients.length === 0 ? (
-        <p className="text-center text-ashtray text-sm">No clients yet</p>
-      ) : (
-        <div className="space-y-2">
-          {clients.map((c) => (
-            <div key={c.name} className="flex items-center justify-between rounded-lg border border-smoke/50 p-3 hover:border-gold/30 transition">
-              <div>
-                <p className="font-medium text-bone">{c.name}</p>
-                <p className="font-mono text-xs text-ashtray">{c.contact}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-mono text-xs text-gold">{c.visits} visits</p>
-                <p className="font-mono text-[10px] text-ashtray">Last: {formatDate(c.lastVisit)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// Notifications Panel
 function Notifications({ bookings }: { bookings: BookingRecord[] }) {
   const [show, setShow] = useState(false)
   const prevCountRef = useRef(bookings.length)
@@ -346,16 +282,9 @@ function Notifications({ bookings }: { bookings: BookingRecord[] }) {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setShow(!show)}
-        className="relative rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold"
-      >
+      <button onClick={() => setShow(!show)} className="relative rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold">
         🔔 Alerts
-        {unread > 0 && (
-          <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-ink">
-            {unread}
-          </span>
-        )}
+        {unread > 0 && <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-ink">{unread}</span>}
       </button>
       {show && (
         <div className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-smoke bg-coal p-4 shadow-xl animate-fade-in">
@@ -372,33 +301,16 @@ function Notifications({ bookings }: { bookings: BookingRecord[] }) {
               ))}
             </div>
           )}
-          <button
-            onClick={() => { setNewBookings([]); setShow(false) }}
-            className="mt-3 w-full rounded-lg border border-smoke py-1.5 font-mono text-xs text-ashtray hover:border-gold hover:text-gold"
-          >
-            Clear All
-          </button>
+          <button onClick={() => { setNewBookings([]); setShow(false) }} className="mt-3 w-full rounded-lg border border-smoke py-1.5 font-mono text-xs text-ashtray hover:border-gold hover:text-gold">Clear All</button>
         </div>
       )}
     </div>
   )
 }
 
-// Export to CSV
 function exportToCSV(bookings: BookingRecord[]) {
   const headers = ['Reference', 'Client', 'Service', 'Barber', 'Date', 'Time', 'Status', 'Contact', 'Notes']
-  const rows = bookings.map((b) => [
-    b.reference,
-    b.client_name,
-    b.service_name || '',
-    b.barber_name || '',
-    b.booking_date || '',
-    b.booking_time || '',
-    b.status,
-    b.contact,
-    b.notes || '',
-  ])
-  
+  const rows = bookings.map((b) => [b.reference, b.client_name, b.service_name || '', b.barber_name || '', b.booking_date || '', b.booking_time || '', b.status, b.contact, b.notes || ''])
   const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
@@ -409,27 +321,25 @@ function exportToCSV(bookings: BookingRecord[]) {
   URL.revokeObjectURL(url)
 }
 
+type Tab = 'overview' | 'bookings' | 'clients' | 'calendar' | 'services' | 'categories' | 'settings'
+
 export function AdminDashboard() {
   const navigate = useNavigate()
   const [bookings, setBookings] = useState<BookingRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
-  const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'clients' | 'calendar'>('overview')
+  const [activeTab, setActiveTab] = useState<Tab>('overview')
   const mountedRef = useRef(true)
 
   useEffect(() => {
     const isAuth = sessionStorage.getItem('slick_admin_auth') === 'true'
-    if (!isAuth) {
-      navigate('/admin/login')
-      return
-    }
+    if (!isAuth) { navigate('/admin/login'); return }
     mountedRef.current = true
     return () => { mountedRef.current = false }
   }, [navigate])
 
   useEffect(() => {
     let active = true
-
     async function load() {
       const data = await fetchBookings(site.api.endpoint)
       if (!active || !mountedRef.current) return
@@ -437,7 +347,6 @@ export function AdminDashboard() {
       setLoading(false)
       setLastRefresh(new Date())
     }
-
     load()
     const id = setInterval(load, POLL_MS)
     return () => { active = false; clearInterval(id) }
@@ -463,12 +372,16 @@ export function AdminDashboard() {
   const confirmedBookings = bookings.filter((b) => b.status === 'confirmed').length
   const todayBookings = bookings.filter((b) => b.booking_date === new Date().toISOString().split('T')[0]).length
   const completedBookings = bookings.filter((b) => b.status === 'completed').length
+  const hotDeals = getHotDeals()
 
-  const tabs = [
-    { id: 'overview' as const, label: 'Overview', icon: '📊' },
-    { id: 'bookings' as const, label: 'Bookings', icon: '📋' },
-    { id: 'calendar' as const, label: 'Calendar', icon: '📅' },
-    { id: 'clients' as const, label: 'Clients', icon: '👥' },
+  const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'bookings', label: 'Bookings', icon: '📋' },
+    { id: 'calendar', label: 'Calendar', icon: '📅' },
+    { id: 'clients', label: 'Clients', icon: '👥' },
+    { id: 'services', label: 'Services', icon: '💇' },
+    { id: 'categories', label: 'Categories', icon: '📂' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
   ]
 
   return (
@@ -479,26 +392,12 @@ export function AdminDashboard() {
             <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-bone">
               Slicks <span className="text-gold">Admin</span>
             </h1>
-            {lastRefresh && (
-              <p className="font-mono text-xs text-ashtray">
-                Last refresh: {lastRefresh.toLocaleTimeString()}
-              </p>
-            )}
+            {lastRefresh && <p className="font-mono text-xs text-ashtray">Last refresh: {lastRefresh.toLocaleTimeString()}</p>}
           </div>
           <div className="flex items-center gap-3">
             <Notifications bookings={bookings} />
-            <Link
-              to="/"
-              className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold"
-            >
-              Back to site
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-red-500 hover:text-red-400"
-            >
-              Logout
-            </button>
+            <Link to="/" className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold">Back to site</Link>
+            <button onClick={handleLogout} className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-red-500 hover:text-red-400">Logout</button>
           </div>
         </div>
       </header>
@@ -510,25 +409,14 @@ export function AdminDashboard() {
           </div>
         ) : (
           <div className="space-y-8 animate-fade-in">
-            {/* Navigation Tabs */}
-            <div className="flex gap-2 border-b border-smoke pb-4">
+            <div className="flex gap-2 border-b border-smoke pb-4 overflow-x-auto">
               {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-wider transition ${
-                    activeTab === tab.id
-                      ? 'bg-gold text-ink'
-                      : 'text-ashtray hover:border hover:border-gold hover:text-gold'
-                  }`}
-                >
-                  <span>{tab.icon}</span>
-                  {tab.label}
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-wider whitespace-nowrap transition ${activeTab === tab.id ? 'bg-gold text-ink' : 'text-ashtray hover:border hover:border-gold hover:text-gold'}`}>
+                  <span>{tab.icon}</span> {tab.label}
                 </button>
               ))}
             </div>
 
-            {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
@@ -538,12 +426,20 @@ export function AdminDashboard() {
                   <StatCard label="Completed" value={completedBookings} icon="✅" color="text-ashtray" />
                   <StatCard label="Today" value={todayBookings} icon="📅" color="text-blue-400" />
                 </div>
-
+                {hotDeals.length > 0 && (
+                  <div className="rounded-xl border border-gold/30 bg-gold/5 p-4">
+                    <h3 className="mb-2 font-mono text-xs uppercase tracking-wider text-gold">🔥 Hot Deals ({hotDeals.length})</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {hotDeals.map((deal) => (
+                        <span key={deal.id} className="rounded-full bg-gold/20 px-3 py-1 font-mono text-xs text-gold">{deal.name} - {deal.price}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="grid gap-6 lg:grid-cols-2">
                   <BookingChart bookings={bookings} />
                   <WeeklyChart bookings={bookings} />
                 </div>
-
                 <div className="grid gap-6 lg:grid-cols-2">
                   <RevenueChart bookings={bookings} />
                   <ServiceBreakdown bookings={bookings} />
@@ -551,39 +447,20 @@ export function AdminDashboard() {
               </div>
             )}
 
-            {/* Bookings Tab */}
             {activeTab === 'bookings' && (
               <div className="rounded-xl border border-smoke bg-coal p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="font-mono text-sm uppercase tracking-wider text-ashtray">
-                    All Bookings ({bookings.length})
-                  </h2>
-                  <button
-                    onClick={() => exportToCSV(bookings)}
-                    className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold"
-                  >
-                    📥 Export CSV
-                  </button>
+                  <h2 className="font-mono text-sm uppercase tracking-wider text-ashtray">All Bookings ({bookings.length})</h2>
+                  <button onClick={() => exportToCSV(bookings)} className="rounded-lg border border-smoke px-4 py-2 font-mono text-xs uppercase tracking-wider text-ashtray transition hover:border-gold hover:text-gold">📥 Export CSV</button>
                 </div>
-
                 {bookings.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <p className="font-display text-xl text-ashtray">No bookings yet</p>
-                  </div>
+                  <div className="py-12 text-center"><p className="font-display text-xl text-ashtray">No bookings yet</p></div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                       <thead>
                         <tr className="border-b border-smoke font-mono text-xs uppercase tracking-wider text-ashtray">
-                          <th className="pb-3 pr-4">Ref</th>
-                          <th className="pb-3 pr-4">Client</th>
-                          <th className="pb-3 pr-4">Service</th>
-                          <th className="pb-3 pr-4">Barber</th>
-                          <th className="pb-3 pr-4">Date</th>
-                          <th className="pb-3 pr-4">Time</th>
-                          <th className="pb-3 pr-4">Status</th>
-                          <th className="pb-3 pr-4">Contact</th>
-                          <th className="pb-3">Actions</th>
+                          <th className="pb-3 pr-4">Ref</th><th className="pb-3 pr-4">Client</th><th className="pb-3 pr-4">Service</th><th className="pb-3 pr-4">Barber</th><th className="pb-3 pr-4">Date</th><th className="pb-3 pr-4">Time</th><th className="pb-3 pr-4">Status</th><th className="pb-3 pr-4">Contact</th><th className="pb-3">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -596,27 +473,12 @@ export function AdminDashboard() {
                             <td className="whitespace-nowrap py-3 pr-4 text-stone-mist">{formatDate(b.booking_date)}</td>
                             <td className="whitespace-nowrap py-3 pr-4 text-stone-mist">{to12h(b.booking_time)}</td>
                             <td className="py-3 pr-4">
-                              <select
-                                value={b.status}
-                                onChange={(e) => handleStatusChange(b.id, e.target.value)}
-                                className={`rounded-full px-2.5 py-0.5 font-mono text-xs uppercase bg-transparent border border-smoke cursor-pointer ${
-                                  statusColor[b.status] ?? 'text-ashtray'
-                                }`}
-                              >
-                                {statusOptions.map((s) => (
-                                  <option key={s} value={s} className="bg-ink text-bone">{s}</option>
-                                ))}
+                              <select value={b.status} onChange={(e) => handleStatusChange(b.id, e.target.value)} className={`rounded-full px-2.5 py-0.5 font-mono text-xs uppercase bg-transparent border border-smoke cursor-pointer ${statusColor[b.status] ?? 'text-ashtray'}`}>
+                                {statusOptions.map((s) => (<option key={s} value={s} className="bg-ink text-bone">{s}</option>))}
                               </select>
                             </td>
                             <td className="whitespace-nowrap py-3 font-mono text-xs text-ashtray">{b.contact}</td>
-                            <td className="py-3">
-                              <button
-                                onClick={() => handleDelete(b.id)}
-                                className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10"
-                              >
-                                ✕
-                              </button>
-                            </td>
+                            <td className="py-3"><button onClick={() => handleDelete(b.id)} className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10">✕</button></td>
                           </tr>
                         ))}
                       </tbody>
@@ -626,14 +488,23 @@ export function AdminDashboard() {
               </div>
             )}
 
-            {/* Calendar Tab */}
             {activeTab === 'calendar' && <CalendarView bookings={bookings} />}
 
-            {/* Clients Tab */}
-            {activeTab === 'clients' && <ClientDirectory bookings={bookings} />}
+            {activeTab === 'clients' && (
+              <div className="rounded-xl border border-smoke bg-coal p-6">
+                <h3 className="mb-4 font-mono text-xs uppercase tracking-wider text-ashtray">Client Directory</h3>
+                <p className="text-ashtray text-sm">Client data is derived from bookings above.</p>
+              </div>
+            )}
+
+            {activeTab === 'services' && <ServiceManager />}
+            {activeTab === 'categories' && <CategoryManager />}
+            {activeTab === 'settings' && <SiteSettings />}
           </div>
         )}
       </main>
     </div>
   )
 }
+
+import { site } from '../data/site-content'
