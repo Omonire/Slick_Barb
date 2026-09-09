@@ -10,11 +10,7 @@ import { Booking } from './components/Booking'
 import { Contact } from './components/Contact'
 import { Footer } from './components/Footer'
 import { MobileBookBar } from './components/MobileBookBar'
-import { Admin } from './components/Admin'
-
 function App() {
-  if (window.location.hash === '#admin') return <Admin />
-
   return (
     <div className="bg-ink text-bone">
       <Nav />

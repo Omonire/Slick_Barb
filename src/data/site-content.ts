@@ -116,7 +116,7 @@ const contact = {
 const socials = [
   { label: 'Instagram', href: 'https://instagram.com/[yourhandle]' },
   { label: 'Facebook', href: 'https://facebook.com/[yourhandle]' },
-  { label: 'TikTok', href: 'https://tiktok.com/@[yourhandle]' },
+  { label: 'TikTok', href: 'https://tiktok.com/@slickbarber' },
 ]
 
 const reviewStats = { average: 5.0, count: '[Total reviews]' }
