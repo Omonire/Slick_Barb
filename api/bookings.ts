@@ -1,6 +1,6 @@
 import postgres from 'postgres'
 
-const DATABASE_URL = process.env.DATABASE_URL
+const DATABASE_URL = process.env['DATABASE_URL']
 
 function newReference(): string {
   const rand = Math.random().toString(36).slice(2, 7).toUpperCase()
@@ -14,7 +14,19 @@ function isValidDateTime(date: unknown, time: unknown): boolean {
   return true
 }
 
-async function storeBooking(record: Record<string, unknown>): Promise<boolean> {
+async function storeBooking(record: {
+  reference: string
+  service_id: string
+  service_name: string | null
+  barber_id: string | null
+  barber_name: string | null
+  booking_date: string
+  booking_time: string
+  client_name: string
+  contact: string
+  notes: string
+  status: string
+}): Promise<boolean> {
   if (!DATABASE_URL) return false
   let sql: ReturnType<typeof postgres> | undefined
   try {
@@ -35,7 +47,8 @@ async function storeBooking(record: Record<string, unknown>): Promise<boolean> {
   }
 }
 
-async function fetchBookings(): Promise<Record<string, unknown>[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchBookings(): Promise<any[]> {
   if (!DATABASE_URL) return []
   let sql: ReturnType<typeof postgres> | undefined
   try {
@@ -48,7 +61,7 @@ async function fetchBookings(): Promise<Record<string, unknown>[]> {
       LIMIT 100
     `
     await sql.end()
-    return rows as unknown as Record<string, unknown>[]
+    return rows
   } catch (err) {
     console.error('bookings: list failed', err)
     if (sql) await sql.end().catch(() => undefined)
@@ -56,20 +69,19 @@ async function fetchBookings(): Promise<Record<string, unknown>[]> {
   }
 }
 
-export default async function handler(req: Request): Promise<Response> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function handler(req: any): Promise<any> {
   const corsHeaders: Record<string, string> = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }
 
-  const url = new URL(req.url)
-
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders })
   }
 
-  if (req.method === 'GET' && url.pathname === '/api/bookings') {
+  if (req.method === 'GET') {
     try {
       const rows = await fetchBookings()
       return Response.json(rows, { headers: corsHeaders })
@@ -79,7 +91,7 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
-  if (req.method === 'POST' && url.pathname === '/api/bookings') {
+  if (req.method === 'POST') {
     let body: Record<string, unknown>
     try {
       body = await req.json() as Record<string, unknown>
