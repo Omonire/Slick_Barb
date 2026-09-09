@@ -26,7 +26,7 @@ export function Hero() {
           aria-hidden="true"
         >
           <source
-            src="https://assets.mixkit.co/videos/preview/mixkit-barber-cutting-a-mans-hair-with-clippers-43242-large.mp4"
+            src="/videos/barber.mp4"
             type="video/mp4"
           />
         </video>
@@ -48,7 +48,7 @@ export function Hero() {
       {/* Video credit */}
       <div className="absolute bottom-2 right-4 z-10">
         <span className="font-mono text-[10px] text-bone/30">
-          Video: Mixkit (free license)
+          Slicks Barber Studio
         </span>
       </div>
 
