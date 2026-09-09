@@ -3,6 +3,7 @@ import { SectionHeading } from './SectionHeading'
 import { Reveal } from './Reveal'
 import { ClockIcon, FacebookIcon, InstagramIcon, PhoneIcon, PinIcon, TikTokIcon } from './Icons'
 import type { JSX } from 'react'
+import { useState } from 'react'
 
 const socialIcons: Record<string, (props: { className?: string }) => JSX.Element> = {
   Instagram: InstagramIcon,
@@ -11,6 +12,19 @@ const socialIcons: Record<string, (props: { className?: string }) => JSX.Element
 }
 
 export function Contact() {
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' })
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStatus('sending')
+    // Simulate sending (connect to email API in production)
+    await new Promise(r => setTimeout(r, 1500))
+    setStatus('sent')
+    setFormData({ name: '', email: '', phone: '', message: '' })
+    setTimeout(() => setStatus('idle'), 3000)
+  }
+
   return (
     <section id="location" className="scroll-mt-20 bg-ink py-24 sm:py-32">
       <div className="container-slick">
@@ -23,7 +37,8 @@ export function Contact() {
           }
         />
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="mt-14 grid gap-10 lg:grid-cols-2">
+          {/* Contact Info */}
           <Reveal>
             <div className="flex flex-col gap-px bg-smoke border border-smoke">
               <div className="flex items-start gap-4 bg-coal p-6">
@@ -96,30 +111,67 @@ export function Contact() {
             </div>
           </Reveal>
 
+          {/* Contact Form */}
           <Reveal delay={1}>
-            <div className="flex h-full flex-col">
-              <div className="relative flex-1 overflow-hidden border border-smoke bg-coal">
-                <iframe
-                  title="Map — Slicks Barber Studio, San Antonio, Texas"
-                  src={site.contact.mapEmbedUrl}
-                  loading="lazy"
-                  className="absolute inset-0 size-full saturate-[0.85]"
-                  style={{ filter: 'invert(0.9) hue-rotate(180deg) contrast(0.9)' }}
-                />
-              </div>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="font-mono text-xs uppercase tracking-[0.2em] text-ashtray">
-                  {site.contact.city} · {site.hours.open} – {site.hours.close}
-                </p>
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=Slicks+Barber+Studio+San+Antonio,+TX"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex cursor-pointer items-center justify-center border border-smoke-light px-5 py-2.5 font-display text-xs font-bold uppercase tracking-[0.15em] text-bone transition-colors duration-200 hover:border-gold hover:text-gold"
+            <div className="h-full">
+              <form onSubmit={handleSubmit} className="flex h-full flex-col gap-4 rounded-xl border border-smoke bg-coal p-6">
+                <h3 className="font-display text-xl font-bold uppercase tracking-tight text-bone">
+                  Send a Message
+                </h3>
+                <p className="text-sm text-ashtray">Questions? Feedback? Drop us a line.</p>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-ashtray">Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full rounded-lg border border-smoke bg-ink px-3 py-2 text-bone font-mono text-sm outline-none transition focus:border-gold"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-ashtray">Phone</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full rounded-lg border border-smoke bg-ink px-3 py-2 text-bone font-mono text-sm outline-none transition focus:border-gold"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-ashtray">Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full rounded-lg border border-smoke bg-ink px-3 py-2 text-bone font-mono text-sm outline-none transition focus:border-gold"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-ashtray">Message *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full resize-none rounded-lg border border-smoke bg-ink px-3 py-2 text-bone font-mono text-sm outline-none transition focus:border-gold"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="w-full rounded-lg bg-gold px-4 py-3 font-mono text-sm font-bold uppercase tracking-wider text-ink transition hover:bg-gold/80 disabled:opacity-50"
                 >
-                  Get directions
-                </a>
-              </div>
+                  {status === 'sending' ? 'Sending...' : status === 'sent' ? '✓ Sent!' : 'Send Message'}
+                </button>
+                {status === 'sent' && (
+                  <p className="text-center text-sm text-green-400">Message sent! We'll get back to you soon.</p>
+                )}
+              </form>
             </div>
           </Reveal>
         </div>

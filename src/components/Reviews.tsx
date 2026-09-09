@@ -2,6 +2,9 @@ import { site } from '../data/site-content'
 import { SectionHeading } from './SectionHeading'
 import { Reveal } from './Reveal'
 import { QuoteIcon, StarIcon } from './Icons'
+import { useState, useEffect } from 'react'
+
+type Review = { name: string; service: string; quote: string; rating: number }
 
 function Stars({ count }: { count: number }) {
   return (
@@ -14,6 +17,17 @@ function Stars({ count }: { count: number }) {
 }
 
 export function Reviews() {
+  const [reviews, setReviews] = useState<Review[]>(site.reviews)
+  
+  useEffect(() => {
+    const stored = localStorage.getItem('slick_cms_reviews')
+    if (stored) {
+      try {
+        setReviews(JSON.parse(stored))
+      } catch {}
+    }
+  }, [])
+
   return (
     <section id="reviews" className="scroll-mt-20 bg-ink py-24 sm:py-32">
       <div className="container-slick">
@@ -43,7 +57,7 @@ export function Reviews() {
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {site.reviews.map((r, i) => (
+          {reviews.map((r, i) => (
             <Reveal key={`${r.name}-${i}`} delay={((i % 3) + 1) as 1 | 2 | 3 | 4}>
               <figure className="flex h-full flex-col border border-smoke bg-coal p-7 transition-colors duration-300 hover:border-gold/40">
                 <QuoteIcon className="size-7 text-gold/50" />

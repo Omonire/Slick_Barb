@@ -1,10 +1,17 @@
 import { preselectBooking } from '../lib/booking'
-import { site } from '../data/site-content'
+import { getServices, type Service } from '../lib/cms'
 import { SectionHeading } from './SectionHeading'
 import { Reveal } from './Reveal'
 import { ArrowRightIcon } from './Icons'
+import { useState, useEffect } from 'react'
 
 export function Services() {
+  const [services, setServices] = useState<Service[]>([])
+  
+  useEffect(() => {
+    setServices(getServices().filter(s => s.active))
+  }, [])
+
   return (
     <section id="services" className="scroll-mt-20 bg-ink py-24 sm:py-32">
       <div className="container-slick">
@@ -19,7 +26,7 @@ export function Services() {
         />
 
         <ul className="mt-14 border-t border-smoke">
-          {site.services.map((s, i) => (
+          {services.map((s, i) => (
             <Reveal as="li" key={s.id}>
               <button
                 type="button"
@@ -35,11 +42,11 @@ export function Services() {
                       <h3 className="font-display text-2xl font-semibold uppercase tracking-tight text-bone sm:text-3xl">
                         {s.name}
                       </h3>
-                      {s.tag ? (
+                      {s.hotDeal && (
                         <span className="border border-gold/60 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">
-                          {s.tag}
+                          🔥 Hot Deal
                         </span>
-                      ) : null}
+                      )}
                     </div>
                     <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-ashtray">{s.description}</p>
                   </div>
