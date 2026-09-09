@@ -7,15 +7,40 @@ import { ArrowRightIcon, StarIcon } from './Icons'
 export function Hero() {
   return (
     <section id="top" className="relative flex min-h-[100svh] items-end overflow-hidden">
-      <img
-        src={images.hero}
-        alt=""
-        aria-hidden="true"
-        fetchPriority="high"
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        poster={images.hero}
         className="absolute inset-0 size-full object-cover"
-      />
+        aria-hidden="true"
+      >
+        <source
+          src="https://videos.pexels.com/video-files/5450148/5450148-uhd_2560_1440_25fps.mp4"
+          type="video/mp4"
+        />
+        {/* Fallback to image if video fails */}
+        <img
+          src={images.hero}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover"
+        />
+      </video>
+      
+      {/* Overlays */}
       <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/25" aria-hidden="true" />
       <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-ink/70 to-transparent" aria-hidden="true" />
+      
+      {/* Video credit */}
+      <div className="absolute bottom-2 right-4 z-10">
+        <span className="font-mono text-[10px] text-bone/30">
+          Video: Pexels (free license)
+        </span>
+      </div>
 
       <div className="container-slick relative z-10 pb-24 pt-36 sm:pb-28">
         <Reveal>
