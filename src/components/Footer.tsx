@@ -84,7 +84,7 @@ export function Footer() {
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ashtray">
           © {year} {site.brand.name} {site.brand.studio} · {site.contact.city}
         </p>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           {site.socials.map((s) => {
             const Icon = socialIcons[s.label] ?? InstagramIcon
             return (
@@ -100,6 +100,12 @@ export function Footer() {
               </a>
             )
           })}
+          <a
+            href="/admin/login"
+            className="ml-2 rounded-lg border border-smoke-light px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-ashtray transition-colors duration-200 hover:border-gold hover:text-gold"
+          >
+            Admin
+          </a>
         </div>
       </div>
     </footer>
