@@ -53,6 +53,7 @@ export function Nav() {
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="inline-flex size-10 cursor-pointer items-center justify-center text-bone lg:hidden"
+            style={{ touchAction: 'manipulation' }}
             aria-expanded={open}
             aria-label={open ? 'Close menu' : 'Open menu'}
           >

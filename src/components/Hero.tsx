@@ -22,7 +22,7 @@ export function Hero() {
           preload="auto"
           poster={images.hero}
           onError={() => setVideoError(true)}
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-cover pointer-events-none"
           aria-hidden="true"
         >
           <source src="/videos/barber.mp4" type="video/mp4" />
@@ -35,13 +35,13 @@ export function Hero() {
           src={images.hero}
           alt=""
           fetchPriority="high"
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-cover pointer-events-none"
         />
       )}
 
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-ink/40" aria-hidden="true" />
-      <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent" aria-hidden="true" />
+      <div className="absolute inset-0 bg-ink/40 pointer-events-none" aria-hidden="true" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent pointer-events-none" aria-hidden="true" />
 
       <div className="container-slick relative z-10 pb-24 pt-36 sm:pb-28">
         <Reveal>
