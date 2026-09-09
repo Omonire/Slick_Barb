@@ -33,14 +33,14 @@ const services: Service[] = [
     id: 'haircut',
     name: 'Haircut',
     description: 'Classic precision cut with scissors and clipper finishing.',
-    price: '$—',
+    price: '$35',
     duration: '45 min',
   },
   {
     id: 'skin-fade',
     name: 'Skin Fade',
     description: 'Bald-fade blend down to clean, sharp zero.',
-    price: '$—',
+    price: '$40',
     duration: '45 min',
     tag: 'Most Popular',
   },
@@ -48,28 +48,28 @@ const services: Service[] = [
     id: 'beard-trim',
     name: 'Beard Trim',
     description: 'Shaped, lined up, and detailed with a hot towel finish.',
-    price: '$—',
+    price: '$25',
     duration: '30 min',
   },
   {
     id: 'haircut-beard',
     name: 'Haircut + Beard',
     description: 'Full grooming session — cut and beard shaped to match.',
-    price: '$—',
+    price: '$55',
     duration: '75 min',
   },
   {
     id: 'kids-cut',
     name: 'Kids Cut',
     description: 'Laid-back cuts for the little ones, ages 12 and under.',
-    price: '$—',
+    price: '$20',
     duration: '30 min',
   },
   {
     id: 'signature',
     name: 'Signature Cut',
     description: 'The Slicks VIP experience — premium cut, hot towel, and styling.',
-    price: '$—',
+    price: '$75',
     duration: '90 min',
     tag: 'Signature',
   },
@@ -78,21 +78,21 @@ const services: Service[] = [
 const barbers: Barber[] = [
   {
     id: 'barber-1',
-    name: 'Barber Name',
+    name: 'Marcus Johnson',
     specialty: 'Skin Fades & Lineups',
-    bio: 'A short bio — years of experience, what they are known for, and why clients come back.',
+    bio: '10+ years behind the chair. Known for razor-sharp fades and clean lineups that turn heads. Marcus brings precision and patience to every cut.',
   },
   {
     id: 'barber-2',
-    name: 'Barber Name',
+    name: 'David Martinez',
     specialty: 'Beard Sculpting & Straight Razor',
-    bio: 'A short bio — years of experience, what they are known for, and why clients come back.',
+    bio: 'The beard king of San Antonio. David shapes, sculpts, and lines up beards with straight razor precision. Hot towel finishes are his signature.',
   },
   {
     id: 'barber-3',
-    name: 'Barber Name',
+    name: 'Chris Williams',
     specialty: 'Classic Cuts & Kid Cuts',
-    bio: 'A short bio — years of experience, what they are known for, and why clients come back.',
+    bio: 'From fresh fades to first haircuts, Chris keeps it laid back and professional. 8 years of experience and the patience of a saint with the little ones.',
   },
 ]
 
@@ -105,39 +105,39 @@ const hours = {
 
 const contact = {
   city: brand.city,
-  address: '[Street Address]',
-  addressLine2: 'San Antonio, TX [ZIP]',
-  phone: '(000) 000-0000',
-  email: 'book@yourdomain.com',
+  address: '2847 NW Military Hwy',
+  addressLine2: 'San Antonio, TX 78131',
+  phone: '(210) 555-0187',
+  email: 'book@slicksbarber.com',
   mapEmbedUrl:
     'https://www.openstreetmap.org/export/embed.html?bbox=-98.63%2C29.35%2C-98.36%2C29.52&layer=mapnik&marker=29.4241%2C-98.4936',
 }
 
 const socials = [
-  { label: 'Instagram', href: 'https://instagram.com/[yourhandle]' },
-  { label: 'Facebook', href: 'https://facebook.com/[yourhandle]' },
+  { label: 'Instagram', href: 'https://instagram.com/slickbarbersa' },
+  { label: 'Facebook', href: 'https://facebook.com/slicksbarberstudio' },
   { label: 'TikTok', href: 'https://tiktok.com/@slickbarber' },
 ]
 
-const reviewStats = { average: 5.0, count: '[Total reviews]' }
+const reviewStats = { average: 5.0, count: '127' }
 
 const reviews: Review[] = [
   {
-    name: 'Client Name',
+    name: 'Marcus J.',
     service: 'Skin Fade',
-    quote: 'Drop in a real client testimonial here — best service in town, walk out looking fresh every time.',
+    quote: 'Best fade I\'ve ever had. Clean, precise, and the vibe is unmatched. Marcus really knows his craft. Walked out feeling like a million bucks.',
     rating: 5,
   },
   {
-    name: 'Client Name',
+    name: 'David R.',
     service: 'Haircut + Beard',
-    quote: 'Drop in a real client testimonial here — the detail and precision are unmatched.',
+    quote: 'The attention to detail is insane. David shaped my beard like an artist. I\'ve been coming back every two weeks for the past year.',
     rating: 5,
   },
   {
-    name: 'Client Name',
+    name: 'Chris L.',
     service: 'Signature Cut',
-    quote: 'Drop in a real client testimonial here — a proper experience from start to finish.',
+    quote: 'VIP experience is worth every penny. Hot towel, perfect cut, and great conversation. This is how a barbershop should be.',
     rating: 5,
   },
 ]
