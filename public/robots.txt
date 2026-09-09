@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /test/
+
+Sitemap: https://slick-barb.vercel.app/sitemap.xml
