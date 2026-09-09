@@ -19,38 +19,29 @@ export function Hero() {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           poster={images.hero}
           onError={() => setVideoError(true)}
           className="absolute inset-0 size-full object-cover"
           aria-hidden="true"
         >
-          <source
-            src="/videos/barber.mp4"
-            type="video/mp4"
-          />
+          <source src="/videos/barber.mp4" type="video/mp4" />
         </video>
       )}
-      
-      {/* Fallback image (always present behind video) */}
-      <img
-        src={images.hero}
-        alt=""
-        aria-hidden="true"
-        fetchPriority="high"
-        className="absolute inset-0 size-full object-cover"
-      />
-      
-      {/* Overlays */}
-      <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/25" aria-hidden="true" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-ink/70 to-transparent" aria-hidden="true" />
-      
-      {/* Video credit */}
-      <div className="absolute bottom-2 right-4 z-10">
-        <span className="font-mono text-[10px] text-bone/30">
-          Slicks Barber Studio
-        </span>
-      </div>
+
+      {/* Fallback image when video fails */}
+      {videoError && (
+        <img
+          src={images.hero}
+          alt=""
+          fetchPriority="high"
+          className="absolute inset-0 size-full object-cover"
+        />
+      )}
+
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-ink/40" aria-hidden="true" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent" aria-hidden="true" />
 
       <div className="container-slick relative z-10 pb-24 pt-36 sm:pb-28">
         <Reveal>
