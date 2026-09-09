@@ -14,6 +14,8 @@ export const images = {
     { src: px(18301169, 900), category: 'fades' },
     { src: px(29189821, 900), category: 'fades' },
     { src: px(9992817, 900), category: 'fades' },
+    { src: px(12464841, 900), category: 'fades' },
+    { src: px(5188621, 900), category: 'fades' },
     { src: px(3998397, 900), category: 'haircuts' },
     { src: px(7697216, 900), category: 'haircuts' },
     { src: px(20638028, 900), category: 'haircuts' },
@@ -24,5 +26,6 @@ export const images = {
     { src: px(7447145, 900), category: 'beards' },
     { src: px(7518745, 900), category: 'beards' },
     { src: px(8867554, 900), category: 'beards' },
+    { src: px(20302331, 900), category: 'beards' },
   ],
 } as const
