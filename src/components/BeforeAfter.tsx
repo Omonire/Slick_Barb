@@ -20,7 +20,7 @@ export function BeforeAfter() {
       className="relative aspect-[16/10] w-full cursor-ew-resize overflow-hidden select-none border border-smoke bg-coal sm:aspect-[16/9]"
       onPointerDown={(e) => {
         dragging.current = true
-        ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
+        containerRef.current?.setPointerCapture(e.pointerId)
         setFromClientX(e.clientX)
       }}
       onPointerMove={(e) => {
