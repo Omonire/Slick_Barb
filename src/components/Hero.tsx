@@ -3,33 +3,43 @@ import { images } from '../data/images'
 import { btnGhost, btnGold } from '../lib/ui'
 import { Reveal } from './Reveal'
 import { ArrowRightIcon, StarIcon } from './Icons'
+import { useRef, useState } from 'react'
 
 export function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [videoError, setVideoError] = useState(false)
+
   return (
     <section id="top" className="relative flex min-h-[100svh] items-end overflow-hidden">
       {/* Video Background */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        poster={images.hero}
-        className="absolute inset-0 size-full object-cover"
-        aria-hidden="true"
-      >
-        <source
-          src="https://videos.pexels.com/video-files/5450148/5450148-uhd_2560_1440_25fps.mp4"
-          type="video/mp4"
-        />
-        {/* Fallback to image if video fails */}
-        <img
-          src={images.hero}
-          alt=""
-          aria-hidden="true"
+      {!videoError && (
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          poster={images.hero}
+          onError={() => setVideoError(true)}
           className="absolute inset-0 size-full object-cover"
-        />
-      </video>
+          aria-hidden="true"
+        >
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-barber-cutting-a-mans-hair-with-clippers-43242-large.mp4"
+            type="video/mp4"
+          />
+        </video>
+      )}
+      
+      {/* Fallback image (always present behind video) */}
+      <img
+        src={images.hero}
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        className="absolute inset-0 size-full object-cover"
+      />
       
       {/* Overlays */}
       <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/25" aria-hidden="true" />
@@ -38,7 +48,7 @@ export function Hero() {
       {/* Video credit */}
       <div className="absolute bottom-2 right-4 z-10">
         <span className="font-mono text-[10px] text-bone/30">
-          Video: Pexels (free license)
+          Video: Mixkit (free license)
         </span>
       </div>
 
